@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+[[ ! -f "arg_parse.bash" ]] && {
+    echo "arg_parse.bash is missing! Critical dependency! Exiting..." >&2
+    exit 255
+}
+
+source arg_parse.bash
+
+[[ ! -d "targets/" ]] && {
+    echo "no target directory! Nothing to run! Exiting..." >&2
+    exit 255
+}
+
+[[ ! -f "targets/common.bash" ]] && {
+    echo "Missing common target! Critical dependency! Exiting..." >&2
+    exit 255
+}
+
+source targets/common.bash
+
+function init () {
+    [[ ! -f .env ]] && echo -e "\n\n\n" > .env
+    source .env
+}
+
+function cleanup () {
+    return
+}
+
+# ================================================================================================
+#                                               MAIN
+function main () {
+    init
+
+    validate_flags
+    execute_flags
+
+    [[ ${IGNORE_DEPENDENCIES} -eq 0 ]] && validate_dependencies
+    validate_target
+
+    cleanup
+}
+
+main
+
